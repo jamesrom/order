@@ -25,7 +25,10 @@ However, to actually order elements whose underlying type is `constraints.Ordere
 // See Float64Slice.Less for a correct implementation for floating-point values.
 ```
 
-This is what `compare` does: provide a consistent interface for ordering these types. To achieve this three type constraints have been defined:
+This is what `compare` solves.
+
+#### Introducing `compare`
+This package provides a consistent interface for ordering these types, with corresponding implementations of LessFunc. To achieve this three type constraints have been defined:
 
 - **compare.SimpleOrdered**<br />
    Use this whenever you only care ordering integers or strings. The LessFunc defined for this type is just the `<` operator.
