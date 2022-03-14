@@ -8,7 +8,7 @@ The package `compare` aims to bring a consistent implementation of a `Less` func
 
 #### The problem with `constraints.Ordered`
 
-With type parameters introduced in Go 1.18, a (currently experimental) package for the standard library has been proposed called `constraints`, which defines the following type constraint:
+With type parameters introduced in Go 1.18, a (currently [experimental](https://pkg.go.dev/golang.org/x/exp)) package for the standard library has been proposed called [constraints](https://pkg.go.dev/golang.org/x/exp/constraints), which defines the following type constraint:
 
 ```go
 // Ordered is a constraint that permits any ordered type: any type that supports the operators < <= >= >. If future releases of Go add new ordered types, this constraint will be modified to include them.
