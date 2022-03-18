@@ -1,6 +1,7 @@
 package chansort
 
 import (
+	"sync"
 	"time"
 
 	"github.com/jamesrom/order/compare"
@@ -24,13 +25,15 @@ func SortSimple[T compare.SimpleOrdered](in <-chan T, window time.Duration) <-ch
 func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.LessFunc[T]) <-chan T {
 	q := priorityqueue.NewWithComparator(fn)
 	out := make(chan T)
+	var m sync.Mutex // mutex ensures FIFO send to out chan
 	go func() {
 		for el := range in {
 			q.Push(el)
 			time.AfterFunc(window, func() {
+				m.Lock()
+				defer m.Unlock()
 				out <- q.Pop()
 			})
-			time.Sleep(1) // sleep 1ns, see: https://play.golang.com/p/3HBcs_tI_TJ
 		}
 		// if we get here that means the channel has closed, so close the output
 		// channel too.

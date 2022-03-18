@@ -6,6 +6,7 @@ import (
 
 	"github.com/jamesrom/order/chansort"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAscending(t *testing.T) {
@@ -99,4 +100,26 @@ func TestWindowSlide(t *testing.T) {
 	assert.Equal(t, 4, <-sortedMessages)
 	assert.Equal(t, 5, <-sortedMessages)
 	assert.Equal(t, MinValue, <-sortedMessages)
+}
+
+func TestSlowConsumer(t *testing.T) {
+	t.Parallel()
+	const WindowSize = 3 * time.Second
+	const BatchSize = 10000
+
+	// fill channel with 10000 messages
+	messages := make(chan int, BatchSize)
+	defer close(messages)
+	for i := 1; i <= BatchSize; i++ {
+		messages <- i
+	}
+
+	// act
+	sortedMessages := chansort.SortSimple(messages, WindowSize)
+
+	// consume slowly
+	for i := 1; i <= BatchSize; i++ {
+		time.Sleep(time.Millisecond)
+		require.Equal(t, i, <-sortedMessages) // assert order
+	}
 }
