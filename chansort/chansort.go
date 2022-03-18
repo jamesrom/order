@@ -30,6 +30,7 @@ func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.Les
 			time.AfterFunc(window, func() {
 				out <- q.Pop()
 			})
+			time.Sleep(1) // sleep 1ns, see: https://play.golang.com/p/3HBcs_tI_TJ
 		}
 		// if we get here that means the channel has closed, so close the output
 		// channel too.
