@@ -1,17 +1,18 @@
 package compare
 
-import (
-	"constraints"
-)
-
+// SimpleOrdered is a union of all the types where < is transitive.
 type SimpleOrdered interface {
-	constraints.Integer | ~string
+	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr | ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~string
 }
 
+// SimpleOrdered is a union of all the types where < is NOT transitive. A NaN
+// check can be used in conjunction to ensure transitivity. This is what
+// `LessFloat` and `LessOrdered` does.
 type FloatOrdered interface {
-	constraints.Float
+	~float32 | ~float64
 }
 
+// Ordered is the union of SimpleOrdered and FloatOrdered.
 type Ordered interface {
 	SimpleOrdered | FloatOrdered
 }
