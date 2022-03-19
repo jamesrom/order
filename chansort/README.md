@@ -6,3 +6,4 @@ See also: https://github.com/jamesrom/priorityqueue
  - [ ] Documentation
  - [ ] Benchmarks
  - [ ] Concurrency tests
+ - [x] Unit tests
