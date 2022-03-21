@@ -123,3 +123,26 @@ func TestSlowConsumer(t *testing.T) {
 		require.Equal(t, i, <-sortedMessages) // assert order
 	}
 }
+
+func TestEarlyClose(t *testing.T) {
+	t.Parallel()
+	const WindowSize = 1 * time.Second
+	const BatchSize = 50
+
+	// fill channel with 50 messages
+	messages := make(chan int, BatchSize)
+	for i := 1; i <= BatchSize; i++ {
+		messages <- i
+	}
+	// close channel
+	close(messages)
+
+	// act
+	sortedMessages := chansort.SortSimple(messages, WindowSize)
+
+	// assert
+	for i := 1; i <= BatchSize; i++ {
+		time.Sleep(time.Millisecond)
+		require.Equal(t, i, <-sortedMessages) // assert order
+	}
+}

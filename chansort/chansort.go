@@ -24,34 +24,40 @@ func SortSimple[T compare.SimpleOrdered](in <-chan T, window time.Duration) <-ch
 func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.LessFunc[T]) <-chan T {
 	q := priorityqueue.NewWithComparator(fn)
 	out := make(chan T)
+	closing := false
 
-	// This goroutine listens for signals that the next element is ready to pop
-	// and sends to the out chan.
+	// This goroutine waits for a signal that the next element is ready to pop
+	// and sends to the out channel.
 	popsig := make(chan any)
 	go func() {
+		// If this defer statement runs, it means the signal channel has closed
+		// and so we can safely close the output channel.
+		defer close(out)
+
 		for range popsig {
 			out <- q.Pop()
+			if closing && q.Len() == 0 {
+				// The last instance of a thing takes the class with it.
+				// Turns out the light and is gone. -CM
+				close(popsig)
+			}
 		}
 	}()
 
 	go func() {
 		for el := range in {
 			q.Push(el)
-
 			// We shouldn't pop from the AfterFunc directly as a slow consumer
 			// will cause a backlog of goroutines that are blocked. And since
 			// there's no guarantee which goroutine will be scheduled to send to
 			// the receiving channel first, this would lead to unordered values
-			// being sent to out chan.
+			// being sent to the out channel.
 			//
 			// Instead, send a signal after the window duration that the next
 			// element is ready to be popped.
 			time.AfterFunc(window, func() { popsig <- nil })
 		}
-		// if we get here that means the input channel has closed, so close the
-		// output channel too.
-		close(out)
-		close(popsig)
+		closing = true
 	}()
 	return out
 }
