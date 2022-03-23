@@ -49,3 +49,6 @@ See [priorityqueue README.md](priorityqueue/README.md).
 
 ### `chansort`
 See [chansort README.md](chansort/README.md).
+
+### `atomicbit`
+See [atomicbit README.md](atomicbit/README.md).

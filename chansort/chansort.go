@@ -3,6 +3,7 @@ package chansort
 import (
 	"time"
 
+	"github.com/jamesrom/order/atomicbit"
 	"github.com/jamesrom/order/compare"
 	"github.com/jamesrom/order/priorityqueue"
 )
@@ -24,7 +25,7 @@ func SortSimple[T compare.SimpleOrdered](in <-chan T, window time.Duration) <-ch
 func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.LessFunc[T]) <-chan T {
 	q := priorityqueue.NewWithComparator(fn)
 	out := make(chan T)
-	closing := false
+	closing := atomicbit.New(false)
 
 	// This goroutine waits for a signal that the next element is ready to pop
 	// and sends to the out channel.
@@ -36,7 +37,7 @@ func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.Les
 
 		for range popsig {
 			out <- q.Pop()
-			if closing && q.Len() == 0 {
+			if closing.Get() && q.Len() == 0 {
 				// The last instance of a thing takes the class with it.
 				// Turns out the light and is gone. -CM
 				close(popsig)
@@ -57,7 +58,7 @@ func SortWithComparator[T any](in <-chan T, window time.Duration, fn compare.Les
 			// element is ready to be popped.
 			time.AfterFunc(window, func() { popsig <- nil })
 		}
-		closing = true
+		closing.Set(true)
 	}()
 	return out
 }

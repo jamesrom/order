@@ -104,8 +104,8 @@ func TestWindowSlide(t *testing.T) {
 
 func TestSlowConsumer(t *testing.T) {
 	t.Parallel()
-	const WindowSize = 3 * time.Second
-	const BatchSize = 10000
+	const WindowSize = 2 * time.Second
+	const BatchSize = 1000
 
 	// fill channel with 10000 messages
 	messages := make(chan int, BatchSize)
