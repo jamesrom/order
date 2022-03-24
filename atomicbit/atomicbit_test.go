@@ -1,7 +1,6 @@
 package atomicbit
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,7 +8,6 @@ import (
 
 func TestFlip(t *testing.T) {
 	bit := New(true)
-	fmt.Println("hi")
 	assert.True(t, bit.Get())
 	bit.Flip()
 	assert.False(t, bit.Get())

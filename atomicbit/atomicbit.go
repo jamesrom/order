@@ -1,3 +1,6 @@
+//go:build !atomicbit_int32 && !atomicbit_uint64 && !atomicbit_int64 && !atomicbit_uintptr
+// +build !atomicbit_int32,!atomicbit_uint64,!atomicbit_int64,!atomicbit_uintptr
+
 package atomicbit
 
 import (
@@ -7,9 +10,11 @@ import (
 type Bit uint32
 
 func New(val bool) (b *Bit) {
-	b = new(Bit)
-	b.Set(val)
-	return b
+	i := uint32(0)
+	if val {
+		i = 1
+	}
+	return (*Bit)(&i)
 }
 
 func (b *Bit) Flip() {
